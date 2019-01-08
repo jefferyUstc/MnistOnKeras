@@ -10,6 +10,7 @@ import numpy as np
 import grpc
 from get_data import x_test, y_test
 
+
 def request_server(img_np,
                    server_url,
                    model_name,
@@ -41,8 +42,8 @@ def request_server(img_np,
     response = stub.Predict(request, 5.0)
     # res_from_server_np = np.asarray(response.outputs[output_name].float_val)
     res_from_server_np = tf.make_ndarray(response.outputs[output_name])  # [[....]]
-    res_from_server_np = res_from_server_np.flatten()
-    return np.where(res_from_server_np==np.max(res_from_server_np))
+    res_from_server_np = res_from_server_np.flatten()  # np.squeeze()
+    return np.where(res_from_server_np == np.max(res_from_server_np))
 
 
 if __name__ == '__main__':
@@ -50,10 +51,10 @@ if __name__ == '__main__':
     x_input = np.expand_dims(x_test[0], 0)
     print(x_input.shape)
     res_from_server_np = request_server(x_input,
-                    '0.0.0.0:8500',
-                    'mymodel', 
-                    'prediction_signature',
-                    "images",
-                    "result")
+                                        '0.0.0.0:8500',
+                                        'mymodel',
+                                        'prediction_signature',
+                                        "images",
+                                        "result")
     print('predict:', res_from_server_np, '\ntruth:',
-                                        np.where(y_test[0]==np.max(y_test[0])))
+          np.where(y_test[0] == np.max(y_test[0])))
